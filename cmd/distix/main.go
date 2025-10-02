@@ -4,7 +4,7 @@ import (
 	"os"
 	"fmt"
 
-	"github.com/distix-pj/distix/cmd/rbg/command"
+	"github.com/distix-pj/distix/cmd/distix/command"
 )
 
 func main() {

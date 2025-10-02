@@ -76,8 +76,8 @@ func NewRootCmd() *cobra.Command {
 	}
 	RootOpts = runner
 	cmd := &cobra.Command{
-		Use:   "rbg",
-		Short: "RBG(RPM Bom Generator)",
+		Use:   "distix",
+		Short: "distix",
 		// Long: `A longer description here..`
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return runner.Setup()
