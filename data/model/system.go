@@ -39,6 +39,16 @@ func (sys *System) BaseProtobomDocument() (*sbom.Document, error) {
 	doc.NodeList.AddNode(rpmTopNode)
 	doc.NodeList.RelateNodeAtID(rpmTopNode, systemNode.Id, sbom.Edge_contains)
 
+	return doc, nil
+}
+
+func (sys *System) Convert2ProtobomDocument() (*sbom.Document, error) {
+	doc, err := sys.BaseProtobomDocument()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return nil, err
+	}
+	rpmTopNode := doc.NodeList.GetNodeByID("RPM-Packages")
 	for _, pkg := range sys.Packages {
 		// 	// if req.IsSoLib() {
 		pkgNode := &sbom.Node{
@@ -50,16 +60,6 @@ func (sys *System) BaseProtobomDocument() (*sbom.Document, error) {
 		doc.NodeList.AddNode(pkgNode)
 		doc.NodeList.RelateNodeAtID(pkgNode, rpmTopNode.Id, sbom.Edge_contains)
 		// 	// }
-	}
-
-	return doc, nil
-}
-
-func (sys *System) Convert2ProtobomDocument() (*sbom.Document, error) {
-	doc, err := sys.BaseProtobomDocument()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return nil, err
 	}
 
 	for _, pkg := range sys.Packages {
@@ -102,7 +102,16 @@ func (sys *System) Convert2MultiProtobomDocument() (*sbom.Document, []*sbom.Docu
 		fmt.Fprintln(os.Stderr, err)
 		return nil, nil, err
 	}
-	return doc, nil, nil
+	pkgDocs := make([]*sbom.Document, len(sys.Packages))
+	for i, pkg := range sys.Packages {
+		pkgDoc, err := pkg.Convert2ProtobomDocument()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return nil, nil, err
+		}
+		pkgDocs[i] = pkgDoc
+	}
+	return doc, pkgDocs, nil
 }
 
 
