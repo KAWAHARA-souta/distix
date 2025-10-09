@@ -53,18 +53,27 @@ func (r *DistSystemRunner) Run() error {
 		fmt.Fprintln(os.Stderr, err)
 		return err
 	}
-	ws := make([]*format.ProtobomWriter, len(subdocs))
+	if w.Write(RootOpts.OutputFile) != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return err
+	}
+
 	for i, subdoc := range subdocs {
-		ws[i], err = format.NewProtobomWriter(subdoc, RootOpts.SbomType)
+		wts, err := format.NewProtobomWriter(subdoc, RootOpts.SbomType)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return err
 		}
-	}
-
-	if w.Write(RootOpts.OutputFile) != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return err
+		outputPath := filepath.Join(RootOpts.OutputSubDir, fmt.Sprintf("doc%v", i))
+		fd, err := os.Create(outputPath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return err
+		}
+		if wts.Write(fd) != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return err
+		}
 	}
 
 	return nil

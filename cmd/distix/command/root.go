@@ -56,6 +56,7 @@ func (r *RootRunner) Setup() error {
 	if err := os.MkdirAll(absOutputSubDir, 0755); err != nil {
 		return err
 	}
+	r.OutputSubDir = absOutputSubDir
 
 	slog.Debug("RootRunner Options",
 		"options", r,
